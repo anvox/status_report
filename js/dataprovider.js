@@ -1,0 +1,4 @@
+ESDataProvider = function(){
+
+  return this;
+}();
