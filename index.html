@@ -68,11 +68,13 @@
 <script type="text/javascript">
 $(function () {
   var dataprovider = ESDataProvider('elasticsearch.ops.production.saleshood.com');
-  dataprovider.get_by_hour(moment().add(-1, 'month').toDate(), success, failure);
+  // dataprovider.get_by_hour(moment().add(-1, 'month').toDate(), success, failure);
+  dataprovider.get_data(moment().add(-1, 'month').toDate(), success);
 
   function success(rawdata){
-    active_user_count = ESTransfromer.extract_user(rawdata);
-    request_count = ESTransfromer.extract_request(rawdata);
+    console.log(rawdata);
+    active_user_count = ESTransfromer.extract_user(rawdata["by_hour"]);
+    request_count = ESTransfromer.extract_request(rawdata["by_hour"]);
 
     chart_data = [active_user_count, request_count];
 
@@ -131,116 +133,8 @@ $(function () {
       ESRenderer.draw_plotline(plotlines);
     });
   };
-  function failure(msg){
-  }
 });
 </script>
-
-<!--
-curl -XGET 'http://localhost:9200/logstash-2015.11.16,logstash-2015.11.15/_search?pretty' -d '{
-  "aggs": {
-    "0": {
-      "date_histogram": {
-        "field": "@timestamp",
-        "interval": "10m"
-      }
-    }
-  }
-}'
-
-
-
-
-curl -XGET 'http://localhost:9200/logstash-2015.11.16,logstash-2015.11.15/_search?pretty' -d '{
-  "aggs": {
-    "0": {
-      "date_histogram": {
-        "field": "@timestamp",
-        "interval": "10m"
-      },
-      "aggs": {
-        "distinct_user_id" : {
-            "cardinality" : {
-              "field" : "user_id"
-            }
-        }
-      }
-    }
-  }
-}'
-
-
-
-
-curl -XGET 'http://localhost:9200/logstash-2015.11.16,logstash-2015.11.15,logstash-2015.11.14,logstash-2015.11.13,logstash-2015.11.12,logstash-2015.11.11,logstash-2015.11.10,logstash-2015.11.09,logstash-2015.11.08,logstash-2015.11.07,logstash-2015.11.06,logstash-2015.11.05,logstash-2015.11.04,logstash-2015.11.03,logstash-2015.11.02,logstash-2015.11.01,logstash-2015.10.31,logstash-2015.10.30,logstash-2015.10.29,logstash-2015.10.28,logstash-2015.10.27,logstash-2015.10.26,logstash-2015.10.25,logstash-2015.10.24,logstash-2015.10.23,logstash-2015.10.22,logstash-2015.10.21,logstash-2015.10.20,logstash-2015.10.19,logstash-2015.10.18,logstash-2015.10.17/_search?pretty' -d '{
-  "query" : {
-    "query_string": {
-      "query": "type:\"rails\" AND tags:(NOT _jsonparsefailure) AND user_id:>0"
-    }
-  },
-  "aggs": {
-    "0": {
-      "date_histogram": {
-        "field": "@timestamp",
-        "interval": "90d"
-      },
-      "aggs": {
-        "distinct_user_id" : {
-            "cardinality" : {
-              "field" : "user_id"
-            }
-        }
-      }
-    }
-  }
-}'
-
-curl -XGET 'http://localhost:9200/logstash-2015.11.01,logstash-2015.10.31,logstash-2015.10.30,logstash-2015.10.29,logstash-2015.10.28,logstash-2015.10.27,logstash-2015.10.26,logstash-2015.10.25,logstash-2015.10.24,logstash-2015.10.23,logstash-2015.10.22,logstash-2015.10.21,logstash-2015.10.20,logstash-2015.10.19,logstash-2015.10.18,logstash-2015.10.17,logstash-2015.10.16,logstash-2015.10.15,logstash-2015.10.14,logstash-2015.10.13,logstash-2015.10.12,logstash-2015.10.11,logstash-2015.10.10,logstash-2015.10.09,logstash-2015.10.08,logstash-2015.10.07,logstash-2015.10.06,logstash-2015.10.05,logstash-2015.10.04,logstash-2015.10.03,logstash-2015.10.02,logstash-2015.10.01,logstash-2015.09.30/_search?pretty' -d '{
-  "query" : {
-    "bool": {
-      "must":[
-        {
-          "query_string": {
-            "query": "type:\"rails\" AND tags:(NOT _jsonparsefailure) AND user_id:>0"
-          }
-        },
-        {
-          "range": {
-            "@timestamp" : {
-                "gte" : "2015-10-1",
-                "lt" :  "2015-11-1"
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggs": {
-    "0": {
-      "date_histogram": {
-        "field": "@timestamp",
-        "interval": "1m"
-      },
-      "aggs": {
-        "distinct_user_id" : {
-            "cardinality" : {
-              "field" : "user_id"
-            }
-        }
-      }
-    }
-  }
-}'
-
-curl -XGET 'http://localhost:9200/logstash-2015.11.01,logstash-2015.10.31,logstash-2015.10.30,logstash-2015.10.29,logstash-2015.10.28,logstash-2015.10.27,logstash-2015.10.26,logstash-2015.10.25,logstash-2015.10.24,logstash-2015.10.23,logstash-2015.10.22,logstash-2015.10.21,logstash-2015.10.20,logstash-2015.10.19,logstash-2015.10.18,logstash-2015.10.17,logstash-2015.10.16,logstash-2015.10.15,logstash-2015.10.14,logstash-2015.10.13,logstash-2015.10.12,logstash-2015.10.11,logstash-2015.10.10,logstash-2015.10.09,logstash-2015.10.08,logstash-2015.10.07,logstash-2015.10.06,logstash-2015.10.05,logstash-2015.10.04,logstash-2015.10.03,logstash-2015.10.02,logstash-2015.10.01,logstash-2015.09.30/_search?pretty' -d '{
-  "query" : {"bool": {"must":[{"query_string": {"query": "type:\"rails\" AND tags:(NOT _jsonparsefailure) AND user_id:>0"} }, {"range": {"@timestamp" : {"gte" : "2015-10-1", "lt" :  "2015-11-1"} } } ] } }, 
-  "aggs": { "distinct_user_id" : {"cardinality" : {"field" : "user_id"} } }
-}'
-
-
-
-
--->
 <script id="reduced-data-template" type="text/x-handlebars-template">
       <table class="table table-condensed">
         <thead>

@@ -31,5 +31,9 @@ ESTransfromer = function(){
     return data["aggregations"]["0"]["buckets"];
   };
 
+  this.extract_total = function(data){
+    
+  };
+
   return this;
 }();

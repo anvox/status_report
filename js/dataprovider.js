@@ -1,7 +1,17 @@
 ESDataProvider = function(endpoint){
   this.endpoint = endpoint;
+  this.data = {};
 
-  this.get_by_hour = function(date, success_handler, failure_handler){
+  this.get_data = function(date, success_handler){
+    $.when(
+        this.get_by_hour(),
+        this.get_total()
+      ).then(function(){
+        success_handler(this.data);
+      });
+  };
+
+  this.get_by_hour = function(date){
     var query_template = Handlebars.compile('http://{{endpoint}}/{{index}}/_search');
     var query = query_template({endpoint: this.endpoint, index: this.build_index(date)});
     var body = this.build_body(date, "h");
@@ -14,11 +24,29 @@ ESDataProvider = function(endpoint){
       context: this
     });
     request.done(function( msg ) {
-      success_handler(msg);
+      this.data["by_hour"] = msg;
     });
-    request.fail(function( jqXHR, textStatus ) {
-      failure_handler(textStatus);
+
+    return request;
+  };
+
+  this.get_total = function(date){
+    var query_template = Handlebars.compile('http://{{endpoint}}/{{index}}/_search');
+    var query = query_template({endpoint: this.endpoint, index: this.build_index(date)});
+    var body = this.build_body_total(date);
+
+    var request = $.ajax({
+      url: query,
+      method: "POST",
+      data: JSON.stringify(body),
+      dataType: "json",
+      context: this
     });
+    request.done(function( msg ) {
+      this.data["total"] = msg;
+    });
+
+    return request;
   };
 
   this.build_index = function(date){
@@ -53,6 +81,24 @@ ESDataProvider = function(endpoint){
           date_histogram: {field: "@timestamp", interval: "1" + resolution },
           aggs: {distinct_user_id: {cardinality: {field: "user_id"} } }
         }
+      }
+    };
+  };
+
+  this.build_body_total = function(date, resolution){
+    var end = moment(date).endOf("month");
+    var start = moment(date).startOf("month");
+    return {
+      query: {
+        bool: {
+          must: [
+            { query_string: { query: 'type:\"rails\" AND tags:(NOT _jsonparsefailure) AND user_id:>0' } },
+            { range: {"@timestamp": {gte : start.format("YYYY-MM-D"), lt :  end.format("YYYY-MM-D")} } }
+          ]
+        }
+      },
+      aggs: {
+        distinct_user_id: {cardinality: {field: "user_id"} }
       }
     };
   };
