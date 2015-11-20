@@ -7,7 +7,7 @@ ESDataProvider = function(endpoint){
         this.get_by_hour(date),
         this.get_total(date)
       ).then(function(){
-        success_handler(this.reportdata);
+        success_handler();
       });
   };
 
