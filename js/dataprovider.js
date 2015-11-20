@@ -24,9 +24,7 @@ ESDataProvider = function(endpoint){
       context: this
     });
     request.done(function( msg ) {
-      console.log("Received 1");
       this.reportdata["by_hour"] = msg;
-      console.log(this.reportdata);
     });
 
     return request;
@@ -45,9 +43,7 @@ ESDataProvider = function(endpoint){
       context: this
     });
     request.done(function( msg ) {
-      console.log("Received 2");
       this.reportdata["total"] = msg;
-      console.log(this.reportdata);
     });
 
     return request;

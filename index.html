@@ -72,7 +72,7 @@ $(function () {
   dataprovider.get_data(moment().add(-1, 'month').toDate(), success);
 
   function success(rawdata){
-    console.log(dataprovider.data);
+    console.log(dataprovider.reportdata);
     active_user_count = ESTransfromer.extract_user(rawdata["by_hour"]);
     request_count = ESTransfromer.extract_request(rawdata["by_hour"]);
 
