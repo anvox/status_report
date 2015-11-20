@@ -1,13 +1,13 @@
 ESDataProvider = function(endpoint){
   this.endpoint = endpoint;
-  this.data = {};
+  this.reportdata = {};
 
   this.get_data = function(date, success_handler){
     $.when(
         this.get_by_hour(date),
         this.get_total(date)
       ).then(function(){
-        success_handler(this.data);
+        success_handler(this.reportdata);
       });
   };
 
@@ -24,7 +24,9 @@ ESDataProvider = function(endpoint){
       context: this
     });
     request.done(function( msg ) {
-      this.data["by_hour"] = msg;
+      console.log("Received 1");
+      this.reportdata["by_hour"] = msg;
+      console.log(this.reportdata);
     });
 
     return request;
@@ -43,7 +45,9 @@ ESDataProvider = function(endpoint){
       context: this
     });
     request.done(function( msg ) {
-      this.data["total"] = msg;
+      console.log("Received 2");
+      this.reportdata["total"] = msg;
+      console.log(this.reportdata);
     });
 
     return request;
