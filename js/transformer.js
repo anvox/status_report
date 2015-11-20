@@ -33,8 +33,8 @@ ESTransfromer = function(){
 
   this.extract_total = function(data){
     return {
-      request: data["took"],
-      user: data["aggregations"]["distinct_user_id"]["distinct_user_id"]
+      request: data["hits"]["total"],
+      user: data["aggregations"]["distinct_user_id"]["value"]
     };
   };
 
