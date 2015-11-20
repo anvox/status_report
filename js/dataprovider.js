@@ -6,12 +6,12 @@ ESDataProvider = function(){
           must:[
             {
               query_string: {
-                query: 'type:"rails" AND tags:(NOT _jsonparsefailure) AND user_id:>0'
+                query: 'type:\"rails\" AND tags:(NOT _jsonparsefailure) AND user_id:>0'
               }
             },
             {
               range: {
-                @timestamp : {
+                "@timestamp": {
                     gte : "2015-10-1",
                     lt :  "2015-11-1"
                 }
@@ -42,14 +42,14 @@ ESDataProvider = function(){
     var request = $.ajax({
       url: query,
       method: "POST",
-      data: body,
+      data: JSON.stringify(body),
       dataType: "json"
     });
     request.done(function( msg ) {
-      success_handler(msg);
+      console.log(msg);
     });
     request.fail(function( jqXHR, textStatus ) {
-      failure_handler(textStatus);
+      console.log(textStatus);
     });
   };
   return this;
