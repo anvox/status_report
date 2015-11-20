@@ -73,10 +73,8 @@ $(function () {
 
   function success(){
     rawdata = dataprovider.reportdata;
-    active_user_count = ESTransfromer.extract_user(rawdata["by_hour"]);
-    request_count = ESTransfromer.extract_request(rawdata["by_hour"]);
-
-    chart_data = [active_user_count, request_count];
+    total = ESTransfromer.extract_total(rawdata["total"]);
+    chart_data = [ESTransfromer.extract_user(rawdata["by_hour"]), ESTransfromer.extract_request(rawdata["by_hour"])];
 
     var data = {
       historical: {
@@ -86,7 +84,7 @@ $(function () {
           average: ESReducer.avg(chart_data[1]),
           std: ESReducer.std(chart_data[1]),
           percentile_90: ESReducer.percentile(0.9, chart_data[1]),
-          total: 7024064,
+          total: total.request,
         },
         user: {
           max: ESReducer.max(chart_data[0]),
@@ -94,7 +92,7 @@ $(function () {
           average: ESReducer.avg(chart_data[0]),
           std: ESReducer.std(chart_data[0]),
           percentile_90: ESReducer.percentile(0.9, chart_data[0]),
-          total: 2022,
+          total: total.user,
         }
       },
       capacity: 2184 * 60
@@ -105,7 +103,6 @@ $(function () {
     $("#rendered-data").html(template(data));
 
     ESRenderer.render('#container', chart_data)
-    capacity = 2184;
     plotlines = [
       {color: "#ff0000", value: data.capacity, label: "Capacity "+data.capacity+"request/h"},
       {color: "#00ff00", value: data.historical.request.percentile_90, label: "90% percentile"}
@@ -118,7 +115,6 @@ $(function () {
         $(".value-total .provision-data.active-user input").val(),
         data.historical );
       $("#rendered-data").html(template(data));
-      capacity = 2184;
       plotlines = [
         {color: "#ff0000", value: data.capacity, label: "Capacity "+data.capacity+"request/h"},
         {

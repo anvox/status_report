@@ -85,7 +85,7 @@ ESDataProvider = function(endpoint){
     };
   };
 
-  this.build_body_total = function(date, resolution){
+  this.build_body_total = function(date){
     var end = moment(date).endOf("month");
     var start = moment(date).startOf("month");
     return {
