@@ -103,6 +103,12 @@ $(function () {
     $("#rendered-data").html(template(data));
 
     ESRenderer.render('#container', chart_data)
+    capacity = 2184;
+    plotlines = [
+      {color: "#ff0000", value: data.capacity, label: "Capacity "+data.capacity+"request/h"},
+      {color: "#00ff00", value: data.historical.request.percentile_90, label: "90% percentile"}
+    ];
+    ESRenderer.draw_plotline(plotlines);
 
     $("#btn-provision").on('click', function(){
       data.provision = ESProvisioner.provision_by_active_user(
