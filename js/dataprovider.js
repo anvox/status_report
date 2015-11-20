@@ -14,7 +14,7 @@ ESDataProvider = function(endpoint){
       context: this
     });
     request.done(function( msg ) {
-      success_handler(this.extract_result(msg));
+      success_handler(msg);
     });
     request.fail(function( jqXHR, textStatus ) {
       failure_handler(textStatus);
@@ -55,10 +55,6 @@ ESDataProvider = function(endpoint){
         }
       }
     };
-  };
-
-  this.extract_result = function(data){
-    return data["aggregations"]["0"]["buckets"];
   };
 
   return this;

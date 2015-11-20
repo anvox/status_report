@@ -68,7 +68,7 @@
 <script type="text/javascript">
 $(function () {
   var dataprovider = ESDataProvider('elasticsearch.ops.production.saleshood.com');
-  data = dataprovider.get_by_hour(moment().add(-1, 'month').toDate(), success, failure);
+  dataprovider.get_by_hour(moment().add(-1, 'month').toDate(), success, failure);
 
   function success(rawdata){
     active_user_count = ESTransfromer.extract_user(rawdata);
@@ -126,7 +126,6 @@ $(function () {
     });
   };
   function failure(msg){
-
   }
 });
 </script>
