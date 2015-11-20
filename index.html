@@ -67,63 +67,67 @@
 
 <script type="text/javascript">
 $(function () {
-  active_user_count = ESTransfromer.extract_user(data_by_hour);
-  request_count = ESTransfromer.extract_request(data_by_hour);
+  var dataprovider = ESDataProvider('elasticsearch.ops.production.saleshood.com');
+  data = dataprovider.get_by_hour(moment().add(-1, 'days').toDate());
 
-  active_user_count_by_minute = ESTransfromer.extract_user(data_by_minute);
-  request_count_by_minute = ESTransfromer.extract_request(data_by_minute);
+  function success(rawdata){
+    active_user_count = ESTransfromer.extract_user(rawdata);
+    request_count = ESTransfromer.extract_request(rawdata);
 
-  // chart_data = [active_user_count_by_minute, request_count_by_minute];
-  chart_data = [active_user_count, request_count];
+    chart_data = [active_user_count, request_count];
 
-  var data = {
-    historical: {
-      request: {
-        max: ESReducer.max(chart_data[1]),
-        min: ESReducer.min(chart_data[1]),
-        average: ESReducer.avg(chart_data[1]),
-        std: ESReducer.std(chart_data[1]),
-        percentile_90: ESReducer.percentile(0.9, chart_data[1]),
-        total: 7024064,
+    var data = {
+      historical: {
+        request: {
+          max: ESReducer.max(chart_data[1]),
+          min: ESReducer.min(chart_data[1]),
+          average: ESReducer.avg(chart_data[1]),
+          std: ESReducer.std(chart_data[1]),
+          percentile_90: ESReducer.percentile(0.9, chart_data[1]),
+          total: 7024064,
+        },
+        user: {
+          max: ESReducer.max(chart_data[0]),
+          min: ESReducer.min(chart_data[0]),
+          average: ESReducer.avg(chart_data[0]),
+          std: ESReducer.std(chart_data[0]),
+          percentile_90: ESReducer.percentile(0.9, chart_data[0]),
+          total: 2022,
+        }
       },
-      user: {
-        max: ESReducer.max(chart_data[0]),
-        min: ESReducer.min(chart_data[0]),
-        average: ESReducer.avg(chart_data[0]),
-        std: ESReducer.std(chart_data[0]),
-        percentile_90: ESReducer.percentile(0.9, chart_data[0]),
-        total: 2022,
-      }
-    },
-    capacity: 2184 * 60
-  }
-  data.provision = data.historical;
+      capacity: 2184 * 60
+    }
+    data.provision = data.historical;
 
-  var template = Handlebars.compile($("#reduced-data-template").html());
-  $("#rendered-data").html(template(data));
-
-  ESRenderer.render('#container', chart_data)
-
-  $("#btn-provision").on('click', function(){
-    data.provision = ESProvisioner.provision_by_active_user(
-      data.historical.user.total, 
-      $(".value-total .provision-data.active-user input").val(),
-      data.historical );
+    var template = Handlebars.compile($("#reduced-data-template").html());
     $("#rendered-data").html(template(data));
-    capacity = 2184;
-    plotlines = [
-      {color: "#ff0000", value: data.capacity, label: "Capacity "+data.capacity+"request/h"},
-      {
-        color: "#00ff00",
-        value: data.historical.request.percentile_90,
-        label: "90% percentile"},
-      {
-        color: "#0000ff",
-        value: data.provision.request.percentile_90,
-        label: "Provisioned 90% percentile"}
-    ];
-    ESRenderer.draw_plotline(plotlines);
-  });
+
+    ESRenderer.render('#container', chart_data)
+
+    $("#btn-provision").on('click', function(){
+      data.provision = ESProvisioner.provision_by_active_user(
+        data.historical.user.total, 
+        $(".value-total .provision-data.active-user input").val(),
+        data.historical );
+      $("#rendered-data").html(template(data));
+      capacity = 2184;
+      plotlines = [
+        {color: "#ff0000", value: data.capacity, label: "Capacity "+data.capacity+"request/h"},
+        {
+          color: "#00ff00",
+          value: data.historical.request.percentile_90,
+          label: "90% percentile"},
+        {
+          color: "#0000ff",
+          value: data.provision.request.percentile_90,
+          label: "Provisioned 90% percentile"}
+      ];
+      ESRenderer.draw_plotline(plotlines);
+    });
+  };
+  function failure(msg){
+
+  }
 });
 </script>
 
