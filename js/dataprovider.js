@@ -21,7 +21,6 @@ ESDataProvider = function(endpoint){
   };
 
   this.build_index = function(date){
-    // logstash-2015.10.16,
     var month = date.getMonth();
     var date = new Date(date.getFullYear(), month, 1);
     date.setDate(date.getDate()-1);
