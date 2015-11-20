@@ -4,8 +4,8 @@ ESDataProvider = function(endpoint){
 
   this.get_data = function(date, success_handler){
     $.when(
-        this.get_by_hour(),
-        this.get_total()
+        this.get_by_hour(date),
+        this.get_total(date)
       ).then(function(){
         success_handler(this.data);
       });
