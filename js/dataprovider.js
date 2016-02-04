@@ -50,16 +50,18 @@ ESDataProvider = function(endpoint){
   };
 
   this.build_index = function(date){
-    var month = date.getMonth();
-    var date = new Date(date.getFullYear(), month, 1);
-    date.setDate(date.getDate()-1);
-    var indices = [];
+    var first_date = moment(date).startOf('month').subtract(1, 'day');
+    var last_date = moment(date).endOf('month').add(1, 'day');
+    var cur_date = first_date;
 
-    while (date.getMonth() <= month) {
-      indices.push("logstash-" + moment(date).format("YYYY.MM.DD"))
-      date.setDate(date.getDate()+1);
+    var indices = [];
+    while(cur_date.isBefore(last_date, 'day')){
+      console.log(cur_date);
+      indices.push("logstash-" + cur_date.format("YYYY.MM.DD"))
+      cur_date.add(1,'days');
     }
-    indices.push("logstash-" + moment(date).format("YYYY.MM.DD"))
+
+    indices.push("logstash-" + last_date.format("YYYY.MM.DD"))
 
     return indices.join(",");
   };
