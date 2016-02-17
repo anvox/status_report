@@ -56,7 +56,6 @@ ESDataProvider = function(endpoint){
 
     var indices = [];
     while(cur_date.isBefore(last_date, 'day')){
-      console.log(cur_date);
       indices.push("logstash-" + cur_date.format("YYYY.MM.DD"))
       cur_date.add(1,'days');
     }
