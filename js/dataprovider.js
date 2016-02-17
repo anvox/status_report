@@ -20,7 +20,7 @@ ESDataProvider = function(endpoint){
       url: query,
       method: "POST",
       data: JSON.stringify(body),
-      dataType: "jsonp",
+      dataType: "json",
       context: this
     });
     request.done(function( msg ) {
@@ -39,7 +39,7 @@ ESDataProvider = function(endpoint){
       url: query,
       method: "POST",
       data: JSON.stringify(body),
-      dataType: "jsonp",
+      dataType: "json",
       context: this
     });
     request.done(function( msg ) {
